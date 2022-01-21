@@ -11,3 +11,4 @@ Cargo.lock
 
 # Executables for each challenge
 /day1/depth
+/day2/navigate
