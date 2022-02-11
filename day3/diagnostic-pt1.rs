@@ -6,27 +6,33 @@ use std::io::prelude::*;
 // This program takes a list of depths from stdin
 // and outputs the number of times that value increases
 
-fn main() -> std::io::Result <()>{
+fn main() -> Result <(), ()>{
     let stdin = std::io::stdin();
     // Figure out how long each binary string is
-    let len = stdin.read_line(&mut String::new())? - 1;
+    let len = match stdin.read_line(&mut String::new()) {
+        Err(e) => panic!("Error reading the first line {:?}", e),
+        Ok(i) => i - 1,
+    };
     println!("Binary string length: {}", len);
     // NOTE: bit_count is in reverse bit order for parsing reasons - e.g. MSB = bit_count[0]
     let mut bit_count: Vec<i32> = vec![0; len];
     let handle = stdin.lock();
 
     // Read in the data
-    for line in handle.lines() {
-        let data = line?;
-        let val = data.as_bytes();
-        for i in 0..=len - 1 {
-            bit_count[i] = match val[i] as char {
+    let lines = handle.lines();
+    for line in lines {
+        if line.is_err() {
+            return Err(());
+        }
+        let val = line.unwrap();
+        val.as_bytes().iter().enumerate().for_each(|(i, x)| {
+            bit_count[i] = match *x as char{
                 '1' => bit_count[i] + 1,
                 '0' => bit_count[i] - 1,
                 _ => {println!("Unrecognized Value");
                       0},
             }
-        };
+        });
         // println!("{:?}: {}, {}", v, v[0], v[1]);
     }
     // Data processing
@@ -46,3 +52,4 @@ fn main() -> std::io::Result <()>{
 
     Ok(())
 }
+
